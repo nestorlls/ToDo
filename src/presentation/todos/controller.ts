@@ -1,68 +1,62 @@
 import { Request, Response } from 'express';
 
-import { prisma } from '../../data/postgresql';
-import { CreateTodoDto, UpdateDto } from '../../domain/dtos';
-import { TodoResository } from '../../domain';
+import {
+  CreateTodoDto,
+  TodoResository,
+  UpdateDto,
+  UseCases,
+} from '../../domain';
 
 export class TodosController {
   //* DI
   constructor(private readonly todoRepository: TodoResository) {}
 
-  public getAll = async (req: Request, res: Response) => {
-    const todos = await this.todoRepository.getAll();
-    console.log({ todos });
-    res.json(todos);
+  public getAll = (req: Request, res: Response) => {
+    new UseCases.Todo.GetTodos(this.todoRepository)
+      .execute()
+      .then((todos) => res.json(todos))
+      .catch((error) => res.status(400).json({ error }))
+      .finally(console.log);
   };
 
-  public getById = async (req: Request, res: Response) => {
+  public getById = (req: Request, res: Response) => {
     const { id } = req.params;
 
-    try {
-      if (isNaN(Number(id))) {
-        throw `Id "${req.params.id}" must be a valid Id`;
-      }
-      const todo = await this.todoRepository.getById(+id);
-      return res.json(todo);
-    } catch (error) {
-      res.status(400).json({ error });
-    }
+    new UseCases.Todo.GetTodo(this.todoRepository)
+      .execute(+id)
+      .then((todo) => res.json(todo))
+      .catch((error) => res.status(400).json({ error }));
   };
 
-  public create = async (req: Request, res: Response) => {
+  public create = (req: Request, res: Response) => {
     const body = req.body;
     const { error, createTodoDto } = CreateTodoDto.create(body);
     if (error) return res.status(400).json({ error });
-    const todo = await this.todoRepository.create(createTodoDto!);
-
-    return res.json(todo);
+    new UseCases.Todo.CreateTodo(this.todoRepository)
+      .execute(createTodoDto!)
+      .then((todo) => res.json(todo))
+      .catch((error) => res.status(400).json({ error }));
   };
 
-  public update = async (req: Request, res: Response) => {
+  public update = (req: Request, res: Response) => {
     const { id } = req.params;
     const body = req.body;
 
     const { error, updateDto } = UpdateDto.create({ ...body, id });
     if (error) return res.status(400).json({ error });
 
-    try {
-      const updatedTodo = await this.todoRepository.update(updateDto!);
-      return res.json(updatedTodo);
-    } catch (error) {
-      res.status(400).json({ error });
-    }
+    new UseCases.Todo.UpdateTodo(this.todoRepository)
+      .execute(updateDto!)
+      .then((todo) => res.json(todo))
+      .catch((error) => res.status(400).json({ error }));
   };
 
-  public deleteTodo = async (req: Request, res: Response) => {
+  public deleteTodo = (req: Request, res: Response) => {
     const { id } = req.params;
 
-    try {
-      if (isNaN(Number(id))) {
-        throw `Id "${req.params.id}" must be a valid Id`;
-      }
-      await this.todoRepository.delete(+id);
-      return res.sendStatus(204);
-    } catch (error) {
-      res.status(400).json({ error });
-    }
+    new UseCases.Todo.DeleteTodo(this.todoRepository)
+      .execute(+id)
+      .then((todo) => res.json(todo))
+      .catch((error) => res.status(400).json({ error }));
   };
 }
