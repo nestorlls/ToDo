@@ -1,6 +1,9 @@
 node_modules
 keys
 postgres
+ 
+#test
+coverage
 
 .env
 package-lock.json
