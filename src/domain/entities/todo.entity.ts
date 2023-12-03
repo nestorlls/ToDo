@@ -13,8 +13,8 @@ export class TodoEnity {
 
   public static fromObject(obj: { [key: string]: any }): TodoEnity {
     const { id, text, completedAt } = obj;
-    if (!id) throw 'Id is required';
-    if (!text) throw 'Text is required';
+    if (!id) throw new CustomeError('Id is required', 400);
+    if (!text) throw new CustomeError('Text is required', 400);
     let newCompletedAt;
     if (completedAt) {
       newCompletedAt = new Date(completedAt);
