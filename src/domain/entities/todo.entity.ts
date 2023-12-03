@@ -1,8 +1,10 @@
+import { CustomeError } from '../errors/custome.error';
+
 export class TodoEnity {
   constructor(
     public id: number,
     public text: string,
-    public completedAt?: Date
+    public completedAt?: Date | null
   ) {}
 
   get isCompleted() {
@@ -17,10 +19,13 @@ export class TodoEnity {
     if (completedAt) {
       newCompletedAt = new Date(completedAt);
       if (isNaN(newCompletedAt.getTime())) {
-        throw 'Property "CompletedAt" must be a valid date';
+        throw new CustomeError(
+          'Property "CompletedAt" must be a valid date',
+          400
+        );
       }
     }
 
-    return new TodoEnity(id, text, newCompletedAt);
+    return new TodoEnity(id, text, completedAt);
   }
 }
