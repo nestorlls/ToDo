@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { TodosController } from './controller';
 import { TodoDataSourceImpl, TodoRepositoryImpl } from '../../infrastructure';
-import { parseId } from '../../middlewares/parce-id.middleware';
 
 export class TodoRoutes {
   static get routes(): Router {
@@ -11,10 +10,10 @@ export class TodoRoutes {
     const todosController = new TodosController(repository);
 
     router.get('/', todosController.getAll);
-    router.get('/:id', [parseId], todosController.getById);
+    router.get('/:id', todosController.getById);
     router.post('/', todosController.create);
-    router.put('/:id', [parseId], todosController.update);
-    router.delete('/:id', [parseId], todosController.deleteTodo);
+    router.put('/:id', todosController.update);
+    router.delete('/:id', todosController.deleteTodo);
 
     return router;
   }
