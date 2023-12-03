@@ -4,7 +4,9 @@ import {
   UpdateDto,
   TodoDataSource,
   TodoEnity,
+  CustomeError,
 } from '../../domain';
+import { validatedId } from '../../helpers';
 
 export class TodoDataSourceImpl implements TodoDataSource {
   async getAll(): Promise<TodoEnity[]> {
@@ -13,9 +15,10 @@ export class TodoDataSourceImpl implements TodoDataSource {
   }
 
   async getById(id: number): Promise<TodoEnity> {
+    validatedId(id);
     const todo = await prisma.todo.findUnique({ where: { id } });
     if (!todo) {
-      throw `Todo with id ${id} not found`;
+      throw new CustomeError(`Todo with id ${id} not found`, 404);
     }
     return TodoEnity.fromObject(todo);
   }
