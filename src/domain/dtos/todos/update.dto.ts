@@ -17,15 +17,15 @@ export class UpdateDto {
   }
 
   static create(props: { [key: string]: any }): {
-    error?: CustomeError;
+    error?: string;
     updateDto?: UpdateDto;
   } {
     const { id, text, completedAt } = props;
     const idNumber = Number(id);
 
     if (isNaN(Number(id))) {
-      throw {
-        error: new CustomeError('Property "Id" must be a number', 400),
+      return {
+        error: 'Property "Id" must be a number',
       };
     }
 
@@ -34,11 +34,8 @@ export class UpdateDto {
       newCompletedAt = new Date(completedAt);
 
       if (newCompletedAt.toString() === 'Invalid Date') {
-        throw {
-          error: new CustomeError(
-            'Property "CompletedAt" must be a valid date',
-            400
-          ),
+        return {
+          error: 'Property "CompletedAt" must be a valid date',
         };
       }
     }
