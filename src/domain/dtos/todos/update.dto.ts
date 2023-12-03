@@ -1,3 +1,5 @@
+import { CustomeError } from '../../errors/custome.error';
+
 export class UpdateDto {
   constructor(
     public readonly id: number,
@@ -15,25 +17,28 @@ export class UpdateDto {
   }
 
   static create(props: { [key: string]: any }): {
-    error?: string;
+    error?: CustomeError;
     updateDto?: UpdateDto;
   } {
     const { id, text, completedAt } = props;
     const idNumber = Number(id);
-    let newCompletedAt = completedAt;
 
     if (isNaN(Number(id))) {
-      return {
-        error: `Id ${id} must be a valid Id`,
+      throw {
+        error: new CustomeError('Property "Id" must be a number', 400),
       };
     }
 
+    let newCompletedAt = completedAt;
     if (completedAt) {
       newCompletedAt = new Date(completedAt);
 
       if (newCompletedAt.toString() === 'Invalid Date') {
-        return {
-          error: 'Property "CompletedAt" must be a valid date',
+        throw {
+          error: new CustomeError(
+            'Property "CompletedAt" must be a valid date',
+            400
+          ),
         };
       }
     }
